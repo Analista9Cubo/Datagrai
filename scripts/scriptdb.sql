@@ -54,6 +54,9 @@ CREATE TABLE IF NOT EXISTS public.alert_rol
 	id_rol NUMERIC
 );
 
+insert into public.sensors (id_sensor, state, coord) values 
+('sensor1', 'activo', '47, 11');
+
 
 CREATE TABLE IF NOT EXISTS public.sensors
 (

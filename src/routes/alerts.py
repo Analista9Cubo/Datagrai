@@ -7,7 +7,7 @@ from src.models.alert_rol import Alert_rol
 
 alert_bp = Blueprint('alert', __name__)
 
-@alert_bp.route('/createalert', methods=['POST'])
+@alert_bp.route('/createAlert', methods=['POST'])
 def create_alert():
     try:
         # Validar datos de entrada
@@ -16,6 +16,7 @@ def create_alert():
         
         alert = Alert(
         alert_level = data['alert_level'],
+        id_sensor = data['id_sensor'],
         umb_min = data['umb_min'],
         umb_max = data['umb_max']
 
@@ -26,7 +27,7 @@ def create_alert():
 
         for x in data['roles']:
             alert_rol = Alert_rol(
-                id_alert = data['id'],
+                id_alert = alert.id,
                 id_rol = x
             )        
             db.session.add(alert_rol)
@@ -50,8 +51,6 @@ def edit_alert():
         # Validar datos de entrada
         data = request.get_json()
 
-        
-        
         roles = Alert_rol.query.filter_by(id_alert=data['id'])
         db.session.delete(roles)
         db.session.commit()
