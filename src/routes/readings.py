@@ -1,3 +1,4 @@
+from decimal import Decimal
 from flask import Blueprint, request, jsonify
 from ..db_con import db
 from ..models.readings import Readings
@@ -21,7 +22,7 @@ def register():
 
         # Crear nueva lectura
         
-        for x in data:
+        for x in data['readings']:
             read = Readings(
                 level = x['level'],
                 time = x['time'],
@@ -33,17 +34,19 @@ def register():
 
             alerts = Alert.query.filter_by(id_sensor = x['sensor'])
             for y in alerts:
-                if x['level'] > y['umb_max'] or x['level'] < y['umb_min']:
+                if Decimal(x['level']) > Decimal(y.umb_max) or Decimal(x['level']) < Decimal(y.umb_min):
+                    print('entro')
                     remitente = 'danielrodf29@gmail.com'
                     password = 'wata qqcq fifh vxlk'
-                    roles = Alert_rol.query.filter_by(id_alert = y['id'])
+                    roles = Alert_rol.query.filter_by(id_alert = y.id)
                     for z in roles:
-                        usuarios = User.query.filter_by(rol_id = z['id_rol'])
+                        usuarios = User.query.filter_by(rol_id = z.id_rol)
                         for w in usuarios:
                             msg = MIMEText('Alerta nivel caudal')
-                            msg['Subject'] = 'Alerta nivel'+ y['alert_level']
+                            msg['Subject'] = 'Alerta nivel'+ y.alert_level
                             msg['From'] = remitente
-                            msg['To'] = w['email']
+                            msg['To'] = 'analista9@grupo-cubo.com'
+                            #w.email
 
                             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
                                 server.login(remitente, password)
@@ -51,7 +54,7 @@ def register():
 
         
         return jsonify({
-            'message': 'Lecura registrada exitosamente',
+            'message': 'Lectura registrada exitosamente',
         }), 201
     except Exception as err:
         db.session.rollback()
@@ -73,7 +76,7 @@ def consulta_externa():
 def get_read(id):
     
     sql = text("""
-    SELECT AVG(level) AS promedio_nivel
+    SELECT coalesce(AVG(level), 0) AS promedio_nivel
     FROM readings_raw
     WHERE DATE_TRUNC('day', time) = DATE_TRUNC('day', CURRENT_DATE)
     AND sensor = :id
@@ -113,4 +116,4 @@ def get_read(id):
             "avg_thri": avg_thri
         })
     else:
-        return jsonify({"error": "Usuario no encontrado"}), 404
+        return jsonify({"error": "Lectura no encontrada"}), 404

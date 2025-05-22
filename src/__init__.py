@@ -18,9 +18,11 @@ def create_app():
     from .routes.readings import read_bp
     from .routes.roles import rol_bp
     from .routes.alerts import alert_bp
+    from .routes.reports import report_bp
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(read_bp, url_prefix='/read')
     app.register_blueprint(rol_bp, url_prefix='/rol')
     app.register_blueprint(alert_bp, url_prefix='/alert')
+    app.register_blueprint(report_bp, url_prefix='/report')
     
     return app

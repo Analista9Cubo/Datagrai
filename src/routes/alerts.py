@@ -45,14 +45,15 @@ def create_alert():
 
 
 
-@alert_bp.route('/updatealert', methods=['PUT'])
+@alert_bp.route('/updateAlert', methods=['PUT'])
 def edit_alert():
     try:
         # Validar datos de entrada
         data = request.get_json()
 
         roles = Alert_rol.query.filter_by(id_alert=data['id'])
-        db.session.delete(roles)
+        for r in roles:
+            db.session.delete(r)
         db.session.commit()
         
         alert =Alert.query.filter_by(id=data['id']).first()
@@ -72,6 +73,8 @@ def edit_alert():
             )        
             db.session.add(alert_rol)
         
+        db.session.commit()
+        
         
         return jsonify({
             'message': 'Alerta actualizada exitosamente',
@@ -81,3 +84,29 @@ def edit_alert():
         db.session.rollback()
         return jsonify({'error': str(err)}), 500
     
+@alert_bp.route('/getAlerts', methods=['GET'])
+def get_alerts():
+    try:
+        
+        alerts =Alert.query.all()
+        return jsonify({'alerts': [a.to_dict() for a in alerts]}), 200
+        
+    except Exception as err:
+        db.session.rollback()
+        return jsonify({'error': str(err)}), 500
+    
+
+@alert_bp.route('/getAlert/<int:id>', methods=['GET'])
+def get_alert(id):
+    try:
+        
+        alert =Alert.query.get(id)
+
+        roles = Alert_rol.query.filter_by(id_alert = id)
+
+        return jsonify({'alert': alert.to_dict(),
+                        'roles': [r.to_dict() for r in roles]}), 200
+        
+    except Exception as err:
+        db.session.rollback()
+        return jsonify({'error': str(err)}), 500

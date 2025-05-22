@@ -26,7 +26,7 @@ def register():
         
         user = User(
             email = data['email'],
-            rol = 'visitante'
+            rol_id = '1'
         )
         user.set_password(data['password'])
         
@@ -69,7 +69,7 @@ def login():
             'access_token': access_token,
             'refresh_token': refresh_token,
             'user': user.email,
-            'rol': user.rol
+            'rol': user.rol_id
         })
         
     except Unauthorized as e:

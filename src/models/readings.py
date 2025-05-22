@@ -7,3 +7,11 @@ class Readings(db.Model):
     level = db.Column(db.Numeric)
     time = db.Column(db.DateTime)
     sensor = db.Column(db.String(50))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'level': self.level,
+            'sensor': self.sensor,
+            'time': self.time
+        }
